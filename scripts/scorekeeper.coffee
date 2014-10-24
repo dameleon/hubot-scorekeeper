@@ -57,22 +57,23 @@ class Scorekeeper
 
 module.exports = (robot) ->
   scorekeeper = new Scorekeeper robot
-  mention_prefix = process.env.HUBOT_SCOREKEEPER_MENTION_PREFIX
-  if mention_prefix
-    mention_matcher = new RegExp("^#{mention_prefix}")
-
+  mention_prefix = process.env.HUBOT_SCOREKEEPER_MENTION_PREFIX || "@"
+  mention_prefix_matcher = new RegExp("^#{mention_prefix}")
+  mention_suffix = process.env.HUBOT_SCOREKEEPER_MENTION_SUFFIX || ":"
+  mention_suffix_matcher = new RegExp("#{mention_suffix}$")
+  
   userName = (user) ->
-    user = user.trim().split(/\s/).slice(-1)[0]
-    if mention_matcher
-      user = user.replace(mention_matcher, "")
+    user = user.trim()
+    user = user.replace(mention_prefix_matcher, "")
+    user = user.replace(mention_suffix_matcher, "")
     user
 
-  robot.hear /(.+)\+\+$/, (msg) ->
+  robot.hear (new RegExp("^\\s?#{mention_prefix}?(\\w+?)#{mention_suffix}?\\s?\\+\\+")), (msg) ->
     user = userName(msg.match[1])
     scorekeeper.increment user, (error, result) ->
       msg.send "incremented #{user} (#{result} pt)"
 
-  robot.hear /(.+)\-\-$/, (msg) ->
+  robot.hear (new RegExp("^\\s?#{mention_prefix}?(\\w+?)#{mention_suffix}?\\s?\\-\\-")), (msg) ->
     user = userName(msg.match[1])
     scorekeeper.decrement user, (error, result) ->
       msg.send "decremented #{user} (#{result} pt)"
