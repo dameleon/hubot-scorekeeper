@@ -19,41 +19,48 @@ class Scorekeeper
   _prefix = "scorekeeper"
 
   constructor: (@robot) ->
-    @_scores = {}
-    @_load()
+    @_scores = null
 
   increment: (user, func) ->
-    @_scores[user] = @_scores[user] or 0
-    @_scores[user]++
+    scores = @_getScore()
+    scores[user] = scores[user] or 0
+    scores[user]++
     @_save()
     @score user, func
 
   decrement: (user, func) ->
-    @_scores[user] = @_scores[user] or 0
-    @_scores[user]--
+    scores = @_getScore()
+    scores[user] = scores[user] or 0
+    scores[user]--
     @_save()
     @score user, func
 
   score: (user, func) ->
-    func false, @_scores[user] or 0
+    scores = @_getScore()
+    func false, scores[user] or 0
 
   rank: (func)->
-    ranking = (for name, score of @_scores
+    scores = @_getScore()
+    ranking = (for name, score of scores
       [name, score]
     ).sort (a, b) -> b[1] - a[1]
     func false, (for i in ranking
       i[0]
     )
 
-  _load: ->
-    scores_json = @robot.brain.get _prefix
-    scores_json = scores_json or '{}'
-    @robot.logger.info "LOAD: " + JSON.stringify(scores_json)
-    @_scores = JSON.parse scores_json
+  _getScore: -> {
+    if (@_scores) {
+      return @_scores
+    }
+    json = @robot.brain.get _prefix
+    json = json or '{}'
+    @_scores = JSON.parse json
+    return @_scores
+  }
 
   _save: ->
-    scores_json = JSON.stringify @_scores
-    @robot.logger.info "SAVE: " + scores_json
+    scores = @_getScore()
+    scores_json = JSON.stringify scores
     @robot.brain.set _prefix, scores_json
 
 

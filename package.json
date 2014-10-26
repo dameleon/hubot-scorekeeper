@@ -1,6 +1,6 @@
 {
   "name": "hubot-scorekeeper",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "hubot script. increment decrement scorekeeper",
   "main": "index.coffee",
   "scripts": {
