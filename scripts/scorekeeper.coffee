@@ -48,10 +48,12 @@ class Scorekeeper
   _load: ->
     scores_json = @robot.brain.get _prefix
     scores_json = scores_json or '{}'
+    @robot.logger.info "LOAD: " + JSON.stringify(score_json)
     @_scores = JSON.parse scores_json
 
   _save: ->
     scores_json = JSON.stringify @_scores
+    @robot.logger.info "SAVE: " + score_json
     @robot.brain.set _prefix, scores_json
 
 
