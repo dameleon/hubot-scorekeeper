@@ -48,15 +48,13 @@ class Scorekeeper
       i[0]
     )
 
-  _getScore: -> {
-    if (@_scores) {
+  _getScore: -> 
+    if (@_scores) 
       return @_scores
-    }
     json = @robot.brain.get _prefix
     json = json or '{}'
     @_scores = JSON.parse json
     return @_scores
-  }
 
   _save: ->
     scores = @_getScore()
